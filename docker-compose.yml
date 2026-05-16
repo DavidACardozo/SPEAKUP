@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  mongodb_speakup:
+    image: mongo:latest
+    container_name: mongodb_speakup
+    ports:
+      - "27018:27017"
+    volumes:
+      - ./mongo-data:/data/db
+
+  api_speakup:
+    image: davidacardozo/speakup-api:v1  # Usar imagen de Docker Hub
+    container_name: api_speakup
+    ports:
+      - "8083:8083"
+    depends_on:
+      - mongodb_speakup
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb_speakup:27017/speakup_db
+
+  frontend_speakup:
+    image: davidacardozo/speakup-frontend:v1  # Usar imagen de Docker Hub
+    container_name: frontend_speakup
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api_speakup
+    stdin_open: true
+    tty: true
+    environment:
+      - REACT_APP_API_URL=http://api_speakup:8083

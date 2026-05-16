@@ -1,0 +1,103 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Fondo general tipo app educativa */
+.registro-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Contenedor principal */
+.registro-container {
+  background: transparent;
+  max-width: 1000px;
+  width: 100%;
+}
+
+/* Tarjeta del formulario */
+.registro-card {
+  border: none;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+}
+
+/* Título principal */
+.title-text {
+  font-weight: 700;
+  color: #1565c0;
+}
+
+/* Inputs suaves */
+.input-field {
+  border-radius: 10px;
+  padding: 10px 12px;
+  border: 1px solid #90caf9;
+  transition: all 0.2s ease-in-out;
+}
+
+.input-field:focus {
+  border-color: #42a5f5;
+  box-shadow: 0 0 5px rgba(66, 165, 245, 0.4);
+}
+
+/* Botón principal */
+.registro-btn {
+  background-color: #42a5f5;
+  border: none;
+  border-radius: 10px;
+  padding: 0.8rem;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background 0.3s ease;
+}
+
+.registro-btn:hover {
+  background-color: #1e88e5;
+}
+
+/* Sección de ilustración */
+.registro-illustration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.illustration-box {
+  text-align: center;
+}
+
+.illustration-img {
+  width: 70%;
+  max-width: 300px;
+  margin-bottom: 1rem;
+}
+
+.illustration-text {
+  font-weight: 700;
+  color: #0d47a1;
+}
+
+@media (max-width: 767px) {
+  .registro-card {
+    margin-top: 2rem;
+  }
+}
+

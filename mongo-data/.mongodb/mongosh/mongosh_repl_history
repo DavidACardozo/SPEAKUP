@@ -1,0 +1,35 @@
+db.categorias.find({}, {_id: 1, nombre: 1, quizId: 1})
+db.usuarios.find({}, {_id: 1, email: 1, intentos: 1})
+db.categorias.findOne({}, {quizId: 1, nombre: 1})
+db.usuarios.findOne({}, {intentos: 1})
+db.usuarios.findOne({}, {intentos: 1})use speakup_db
+show dbs
+db.usuarios.findOne({ email: "andressantan@gmail.com" }, { rol: 1 })
+)    { $set: { rol: "admin" } }    { email: "andressantan@gmail.com" },db.usuarios.updateOne(
+db.usuarios.find().pretty()
+db.usuarios.updateOne({ email: "andressant@gmail.com" }, { $set: { rol: "admin" } })
+db.usuarios.updateOne({ email: "andressant@gmail.com" }, { $set: { rol: "admin" } })use speakup_db
+docker exec -it mongodb_speakup mongosh
+docker exec -it mongodb_speakup mongosh --eval "use speakup_db; db.usuarios.updateOne({ email: 'andressant@gmail.com' }, { $set: { rol: 'admin' } })"
+b.usuarios.updateOne({ email: 'andressant@gmail.com' }, { $set: { rol: 'admin' } })"
+db.usuarios.updateOne({ email: 'andressant@gmail.com' }, { \$set: { rol: 'admin' } })"
+use speakup_db;
+"use speakup_db;
+"use speakup_db; db.usuarios.updateOne({ email: 'andressant@gmail.com' }, { \$set: { rol: 'admin' } })"
+exit
+db.usuarios.findOne({ email: "andressantan@gmail.com" })
+)    { $set: { rol: "admin" } }    { email: "andressantan@gmail.com" },db.usuarios.updateOne(
+)    { $set: { rol: "admin" } }    { email: "andressantan@gmail.com" },db.usuarios.updateOne(use speakup_db
+exit
+show collections
+exitshow collectionsuse speakup_db
+exit
+db.dropDatabase()
+exitdb.dropDatabase()use speakup_db
+exit
+db.dropDatabase()
+db.usuarios_categorias.drop()db.categories.drop()
+show collectionsuse speakup_db
+docker-compose up -d
+db.usuarios.find()
+use speakup_db
