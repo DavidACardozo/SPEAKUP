@@ -39,8 +39,12 @@ public class SecurityConfig {
                 .requestMatchers("/api/usuarios/login", "/api/usuarios/registrar").permitAll()
                 
                 // 2. RUTAS DE ADMINISTRADOR
-                .requestMatchers("/api/admin/**").hasAnyAuthority("admin", "ADMIN", "ROLE_admin", "ROLE_ADMIN")
-                .requestMatchers("/api/categorias/**").hasAnyAuthority("admin", "ADMIN", "ROLE_admin", "ROLE_ADMIN")                    
+               // Cambia esto:
+             // 1. Localiza esta línea:
+.requestMatchers("/api/categorias/**").hasAnyAuthority("admin", "ADMIN", "ROLE_admin", "ROLE_ADMIN")
+
+// 2. Cámbiala por esta (que es más robusta y estándar):
+.requestMatchers("/api/categorias", "/api/categorias/**").hasRole("ADMIN")                  
 
                 // 3. RUTAS DE QUIZ - CUALQUIER USUARIO AUTENTICADO (NUEVO)
                 .requestMatchers("/api/quiz/**").authenticated()
@@ -50,6 +54,7 @@ public class SecurityConfig {
 
                 // 5. RUTAS DE USUARIO AUTENTICADO
                 .requestMatchers("/api/usuarios/**").authenticated()
+
 
                 // 6. CUALQUIER OTRA RUTA
                 .anyRequest().authenticated()

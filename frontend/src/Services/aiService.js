@@ -1,6 +1,6 @@
 import { HfInference } from "@huggingface/inference";
 
-const hf = process.env.REACT_APP_HF_TOKEN;
+const hf = new HfInference(process.env.REACT_APP_HF_TOKEN);
 
 export const generarParrafoIA = async (categoria, palabrasClave) => {
   const MODELO = "Qwen/Qwen2.5-7B-Instruct";
