@@ -4,7 +4,7 @@ import clienteAxios from "../../Api/axiosConfig";
 import { useAuth } from "../../Context/AuthContext";
 import { Container, Table, Button, Badge, Spinner, Alert, Modal } from "react-bootstrap";
 import Sidebar from "../../Components/Sidebar";
-import { FaCog, FaUserCog, FaEdit, FaTrashAlt, FaFolderPlus, FaSave, FaTimes, FaListUl } from "react-icons/fa";
+import { FaCog, FaUserCog, FaEdit, FaTrashAlt, FaFolderPlus, FaSave, FaTimes, FaListUl, FaCheck } from "react-icons/fa";
 
 const AdminPanel = () => {
   const { logout } = useAuth();
@@ -12,11 +12,11 @@ const AdminPanel = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Modos de formulario: "LISTAR", "CREAR", "EDITAR"
   const [modo, setModo] = useState("LISTAR");
   const [idCategoriaEditando, setIdCategoriaEditando] = useState(null);
 
-  // Estados del Formulario principal (Crear / Editar)
+  const [indexVocabEditando, setIndexVocabEditando] = useState(-1);
+
   const [formData, setFormData] = useState({
     nombre: "",
     descripcion: "",
@@ -24,26 +24,22 @@ const AdminPanel = () => {
     vocabularios: [],
   });
 
-  // Estado temporal para las palabras sueltas antes de agregarlas a la lista
   const [vocabTemp, setVocabTemp] = useState({
     palabraIngles: "",
     palabraEspanol: "",
     pronunciacion: "",
   });
 
-  // Estado para el modal de eliminación
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [catAEliminar, setCatAEliminar] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
-  // Configuración del Sidebar dinámico
   const userMenu = [
     { name: "Gestionar categorias", path: "/admin", Icon: FaCog },
     { name: "Gestionar usuarios", path: "/usuarios", Icon: FaUserCog },
     { name: "Gestionar Quiz", path: "/Quiz", Icon: FaEdit },
   ];
 
-  // 🔄 1. OBTENER CATEGORÍAS (GET)
   const fetchCategorias = async () => {
     try {
       setLoading(true);
@@ -65,28 +61,45 @@ const AdminPanel = () => {
     fetchCategorias();
   }, []);
 
-  // ➕ GESTIÓN TEMPORAL DE VOCABULARIO EN MEMORIA
-  const agregarVocabulario = () => {
+  const guardarVocabulario = () => {
     if (!vocabTemp.palabraIngles || !vocabTemp.palabraEspanol || !vocabTemp.pronunciacion) {
       alert("Por favor, completa todos los campos del vocabulario.");
       return;
     }
 
-    const nuevoVocabulario = { ...vocabTemp };
-    setFormData({
-      ...formData,
-      vocabularios: [...formData.vocabularios, nuevoVocabulario],
-    });
+    const listaActualizada = [...formData.vocabularios];
+
+    if (indexVocabEditando > -1) {
+      listaActualizada[indexVocabEditando] = { ...vocabTemp };
+      setIndexVocabEditando(-1); // Reseteamos el modo edición de palabra
+    } else {
+      listaActualizada.push({ ...vocabTemp });
+    }
+
+    setFormData({ ...formData, vocabularios: listaActualizada });
+    setVocabTemp({ palabraIngles: "", palabraEspanol: "", pronunciacion: "" });
+  };
+
+  const seleccionarVocabularioParaEditar = (index) => {
+    setIndexVocabEditando(index);
+    setVocabTemp({ ...formData.vocabularios[index] });
+  };
+
+  const cancelarEdicionVocabulario = () => {
+    setIndexVocabEditando(-1);
     setVocabTemp({ palabraIngles: "", palabraEspanol: "", pronunciacion: "" });
   };
 
   const eliminarVocabulario = (index) => {
     const nuevaLista = [...formData.vocabularios];
     nuevaLista.splice(index, 1);
+    if (index === indexVocabEditando) {
+      setIndexVocabEditando(-1);
+      setVocabTemp({ palabraIngles: "", palabraEspanol: "", pronunciacion: "" });
+    }
     setFormData({ ...formData, vocabularios: nuevaLista });
   };
 
-  // 💾 2. GUARDAR: MANEJA EL SUBMIT TANTO PARA CREAR COMO PARA ACTUALIZAR
   const handleSubmitFormulario = async (e) => {
     e.preventDefault();
     if (!formData.nombre || !formData.descripcion) {
@@ -99,19 +112,18 @@ const AdminPanel = () => {
       const headers = { Authorization: `Bearer ${token}` };
 
       if (modo === "CREAR") {
-        // Enviar DTO Completo a @PostMapping
         const response = await clienteAxios.post("/admin/categorias", formData, { headers });
         if (response.status === 200 || response.status === 201) {
           alert("¡Categoría y vocabularios creados con éxito!");
         }
       } else if (modo === "EDITAR") {
-        // Enviar a @PutMapping("/{id}") pasando el DTO con nombre y descripción
         await clienteAxios.put(`/admin/categorias/${idCategoriaEditando}`, formData, { headers });
-        alert("¡Categoría actualizada con éxito!");
+        alert("¡Categoría y vocabulario actualizados con éxito!");
       }
 
-      // Reiniciar interfaz y recargar tabla limpia
       setFormData({ nombre: "", descripcion: "", nivel: 1, vocabularios: [] });
+      setVocabTemp({ palabraIngles: "", palabraEspanol: "", pronunciacion: "" });
+      setIndexVocabEditando(-1);
       setModo("LISTAR");
       setIdCategoriaEditando(null);
       fetchCategorias();
@@ -122,19 +134,19 @@ const AdminPanel = () => {
     }
   };
 
-  // ✍️ 3. PREPARAR EDICIÓN (Cargar datos en el formulario)
   const iniciarEdicion = (categoria) => {
     setIdCategoriaEditando(categoria.id || categoria._id);
     setFormData({
       nombre: categoria.nombre || "",
       descripcion: categoria.descripcion || "",
       nivel: categoria.nivel || 1,
-      vocabularios: categoria.vocabularios || [], // Muestra sus palabras actuales si existen
+      vocabularios: categoria.vocabularios ? [...categoria.vocabularios] : [],
     });
+    setIndexVocabEditando(-1); 
+    setVocabTemp({ palabraIngles: "", palabraEspanol: "", pronunciacion: "" });
     setModo("EDITAR");
   };
 
-  // 🗑️ 4. CONTROL DE ELIMINACIÓN (DELETE)
   const abrirModalEliminar = (categoria) => {
     setCatAEliminar(categoria);
     setShowDeleteModal(true);
@@ -162,7 +174,6 @@ const AdminPanel = () => {
     }
   };
 
-  // 🖥️ RENDERIZADOS CONDICIONALES INTERNOS
   const renderListado = () => (
     <div className="card shadow-sm p-4 border-0 rounded-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -237,12 +248,10 @@ const AdminPanel = () => {
     <div className="card shadow-sm p-4 border-0 rounded-4">
       <div className="border-bottom pb-3 mb-4">
         <h4 className="fw-bold m-0 text-primary-emphasis">
-          {modo === "CREAR" ? "✨ Crear Categoría Completa" : "📝 Modificar Categoría"}
+          {modo === "CREAR" ? "✨ Crear Categoría Completa" : "📝 Modificar Categoría y Vocabulario"}
         </h4>
         <small className="text-muted">
-          {modo === "CREAR" 
-            ? "Agrega un nuevo módulo junto con sus palabras iniciales de vocabulario." 
-            : "Estás modificando la metadata principal del módulo."}
+          Modifica los detalles del módulo así como sus términos, traducciones y pronunciaciones asociadas.
         </small>
       </div>
 
@@ -273,69 +282,104 @@ const AdminPanel = () => {
           </div>
         </div>
 
-        {/* El subformulario de agregar vocabulario solo es visible en modo CREAR para simplificar la interfaz */}
-        {modo === "CREAR" && (
-          <div className="border p-3 rounded-3 mb-4">
-            <h6 className="fw-bold mb-3 text-secondary">Agregar Vocabulario Asociado</h6>
-            <div className="row g-2">
-              <div className="col-md-4">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Palabra en Inglés (Ej: Mother)"
-                  value={vocabTemp.palabraIngles}
-                  onChange={(e) => setVocabTemp({ ...vocabTemp, palabraIngles: e.target.value })}
-                />
-              </div>
-              <div className="col-md-4">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Traducción (Ej: Madre)"
-                  value={vocabTemp.palabraEspanol}
-                  onChange={(e) => setVocabTemp({ ...vocabTemp, palabraEspanol: e.target.value })}
-                />
-              </div>
-              <div className="col-md-3">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Pronunciación (/máder/)"
-                  value={vocabTemp.pronunciacion}
-                  onChange={(e) => setVocabTemp({ ...vocabTemp, pronunciacion: e.target.value })}
-                />
-              </div>
-              <div className="col-md-1">
-                <Button variant="primary" className="w-100 fw-bold" onClick={agregarVocabulario}>+</Button>
-              </div>
+        <div className="border p-3 rounded-3 mb-4">
+          <h6 className="fw-bold mb-3 text-secondary">
+            {indexVocabEditando > -1 ? "✏️ Editando Palabra de la Lista" : "➕ Agregar Vocabulario Asociado"}
+          </h6>
+          <div className="row g-2">
+            <div className="col-md-4">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Palabra en Inglés (Ej: Mother)"
+                value={vocabTemp.palabraIngles}
+                onChange={(e) => setVocabTemp({ ...vocabTemp, palabraIngles: e.target.value })}
+              />
             </div>
+            <div className="col-md-4">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Traducción (Ej: Madre)"
+                value={vocabTemp.palabraEspanol}
+                onChange={(e) => setVocabTemp({ ...vocabTemp, palabraEspanol: e.target.value })}
+              />
+            </div>
+            <div className="col-md-3">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Pronunciación (/máder/)"
+                value={vocabTemp.pronunciacion}
+                onChange={(e) => setVocabTemp({ ...vocabTemp, pronunciacion: e.target.value })}
+              />
+            </div>
+            <div className="col-md-1 d-flex gap-1">
+              {/* Botón dinámico: cambia de '+' a un check verde si se está editando una palabra */}
+              <Button 
+                variant={indexVocabEditando > -1 ? "success" : "primary"} 
+                className="w-100 fw-bold" 
+                onClick={guardarVocabulario}
+                title={indexVocabEditando > -1 ? "Aplicar cambios a la palabra" : "Agregar palabra"}
+              >
+                {indexVocabEditando > -1 ? <FaCheck /> : "+"}
+              </Button>
+              {indexVocabEditando > -1 && (
+                <Button 
+                  variant="outline-secondary" 
+                  onClick={cancelarEdicionVocabulario}
+                  title="Cancelar edición de palabra"
+                >
+                  <FaTimes />
+                </Button>
+              )}
+            </div>
+          </div>
 
-            {formData.vocabularios.length > 0 && (
-              <div className="mt-4">
-                <p className="fw-bold text-dark mb-2">Palabras a guardar ({formData.vocabularios.length}):</p>
-                <ul className="list-group shadow-sm max-vh-25 overflow-auto">
-                  {formData.vocabularios.map((v, index) => (
-                    <li key={index} className="list-group-item d-flex justify-content-between align-items-center bg-white border-light">
-                      <span>
-                        <strong className="text-primary">{v.palabraIngles}</strong>
-                        <span className="text-muted mx-2">➔</span>
-                        {v.palabraEspanol} <small className="text-secondary italic ms-1">({v.pronunciacion})</small>
-                      </span>
-                      <Button variant="link" className="text-danger p-0 border-0 text-decoration-none small" onClick={() => eliminarVocabulario(index)}>
+          {formData.vocabularios.length > 0 && (
+            <div className="mt-4">
+              <p className="fw-bold text-dark mb-2">Lista de Palabras ({formData.vocabularios.length}):</p>
+              <ul className="list-group shadow-sm max-vh-25 overflow-auto" style={{ maxHeight: "300px" }}>
+                {formData.vocabularios.map((v, index) => (
+                  <li 
+                    key={index} 
+                    className={`list-group-item d-flex justify-content-between align-items-center border-light bg-white ${index === indexVocabEditando ? 'border-warning bg-warning bg-opacity-10' : ''}`}
+                  >
+                    <span>
+                      <strong className="text-primary">{v.palabraIngles}</strong>
+                      <span className="text-muted mx-2">➔</span>
+                      {v.palabraEspanol} <small className="text-secondary italic ms-1">({v.pronunciacion})</small>
+                    </span>
+                    <div className="d-flex gap-3">
+                      <Button 
+                        variant="link" 
+                        className="text-warning p-0 border-0 text-decoration-none small fw-semibold" 
+                        onClick={() => seleccionarVocabularioParaEditar(index)}
+                        disabled={indexVocabEditando === index}
+                      >
+                        Editar
+                      </Button>
+                      <Button 
+                        variant="link" 
+                        className="text-danger p-0 border-0 text-decoration-none small" 
+                        onClick={() => eliminarVocabulario(index)}
+                      >
                         Quitar
                       </Button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
 
         <div className="d-flex gap-2 justify-content-end border-top pt-3">
           <Button variant="outline-secondary" className="px-4 rounded-pill" type="button" onClick={() => {
             setModo("LISTAR");
             setFormData({ nombre: "", descripcion: "", nivel: 1, vocabularios: [] });
+            setVocabTemp({ palabraIngles: "", palabraEspanol: "", pronunciacion: "" });
+            setIndexVocabEditando(-1);
           }}>
             <FaTimes className="me-1" /> Cancelar
           </Button>
@@ -365,7 +409,6 @@ const AdminPanel = () => {
         </Container>
       </div>
 
-      {/* MODAL DE CONFIRMACIÓN PARA BORRAR CATEGORÍA + QUIZ EN CASCADA */}
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered backdrop="static">
         <Modal.Header closeButton className="border-0 pb-0">
           <Modal.Title className="fw-bold text-danger">⚠️ ¿Eliminar este módulo?</Modal.Title>

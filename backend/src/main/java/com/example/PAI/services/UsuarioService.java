@@ -58,7 +58,7 @@ public class UsuarioService {
 
         String username = generarUsername(nombre, apellido);
         usuario.setUsername(username);
-        usuario.setRol("Usuario"); 
+        usuario.setRol("USER"); 
         
         usuario.setPassword(passwordEncoder.encode(password));
 

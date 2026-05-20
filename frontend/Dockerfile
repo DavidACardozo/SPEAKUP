@@ -1,19 +1,23 @@
-# Dockerfile para tu frontend (Fronend_PA)
-FROM node:18-alpine
+FROM node:18-alpine AS build
 
 WORKDIR /app
 
-# Copiamos archivos de dependencias
+ARG REACT_APP_API_URL=http://localhost:8083/api
+ENV REACT_APP_API_URL=$REACT_APP_API_URL
+
 COPY package*.json ./
+RUN npm ci
 
-# Instalamos dependencias
-RUN npm install
-
-# Copiamos el resto del código
 COPY . .
+RUN npm run build
 
-# Exponemos el puerto de React
-EXPOSE 3000
+FROM nginx:1.27-alpine
 
-# Arrancamos la app
-CMD ["npm", "start"]
+COPY nginx.conf /etc/nginx/templates/default.conf.template
+COPY --from=build /app/build /usr/share/nginx/html
+COPY docker-entrypoint.sh /docker-entrypoint.d/05-runtime-env.sh
+RUN chmod +x /docker-entrypoint.d/05-runtime-env.sh
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

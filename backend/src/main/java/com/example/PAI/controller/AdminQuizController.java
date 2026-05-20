@@ -17,11 +17,12 @@ public class AdminQuizController {
     private final QuizRepository quizRepository;
     private final AdminService adminService;
 
+    // 🔥 NUEVO → LISTAR QUIZZES
 @GetMapping
 public ResponseEntity<?> listarQuizzes() {
     return ResponseEntity.ok(adminService.listarQuizzes());
 }
-
+    // 🔥 NUEVO → ELIMINAR QUIZ
 @DeleteMapping("/{id}")
 public ResponseEntity<?> eliminarQuiz(@PathVariable String id) {
     try {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Container,
@@ -26,6 +26,9 @@ import Sidebar from "../Components/Sidebar";
 import clienteAxios from "../Api/axiosConfig";
 import { useAuth } from "../Context/AuthContext";
 
+const QUIZ_PASS_SCORE = 80;
+const FINAL_QUIZ_PASS_SCORE = 90;
+
 const Modulos = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -35,15 +38,14 @@ const Modulos = () => {
   const [selectedCategoria, setSelectedCategoria] = useState(null);
   const [showVocabularioModal, setShowVocabularioModal] = useState(false);
 
-   const userMenu = [
-     { name: "Inicio", path: "/inicio", Icon: FaHome },
-     { name: "Módulos", path: "/modulos", Icon: FaLayerGroup },
-     { name: "Historial", path: "/historial-quizes", Icon: FaBookOpen },
-     { name: "Perfil", path: "/perfil", Icon: FaUserCircle },
-     { name: "Speaking", path: "/PracticeWithIA", Icon: FaMicrophone },
-     { name: "Gap Fill", path: "/PracticeWords", Icon: FaPencilAlt }, 
-   ];
-
+  const userMenu = [
+    { name: "Inicio", path: "/inicio", Icon: FaHome },
+    { name: "Módulos", path: "/modulos", Icon: FaLayerGroup },
+    { name: "Historial", path: "/historial-quizes", Icon: FaBookOpen },
+    { name: "Perfil", path: "/perfil", Icon: FaUserCircle },
+    { name: "Speaking", path: "/PracticeWithIA", Icon: FaMicrophone },
+    { name: "Gap Fill", path: "/PracticeWords", Icon: FaPencilAlt }, 
+  ];
 
   const [isQuizActive, setIsQuizActive] = useState(false);
   const [currentQuestions, setCurrentQuestions] = useState([]);
@@ -52,27 +54,41 @@ const Modulos = () => {
   const [quizLoading, setQuizLoading] = useState(false);
   const [showResultadoModal, setShowResultadoModal] = useState(false);
   const [resultadoQuiz, setResultadoQuiz] = useState({ puntaje: 0, correctas: 0, totalPreguntas: 0 });
+  
+  const [quizesCompletados, setQuizesCompletados] = useState({ quiz1: false, quiz2: false, quiz3: false });
+  const [currentQuizIndexActive, setCurrentQuizIndexActive] = useState(0);
+  const selectedQuizIds = selectedCategoria?.quizIds || [];
+  const canStartQuiz2 = quizesCompletados.quiz1;
+  const canStartQuiz3 = quizesCompletados.quiz2;
 
-  useEffect(() => {
-    const fetchCategorias = async () => {
-      if (!user?.id) return;
-      try {
-        setLoading(true);
-        const response = await clienteAxios.get(`/usuarios/${user.id}/categorias-desbloqueadas`);
-        setCategorias(response.data);
-      } catch (err) {
-        console.error("Error al cargar módulos", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCategorias();
+  const fetchCategorias = useCallback(async () => {
+    if (!user?.id) return;
+    try {
+      setLoading(true);
+      const response = await clienteAxios.get(`/usuarios/${user.id}/categorias-desbloqueadas`);
+      setCategorias(response.data);
+    } catch (err) {
+      console.error("Error al cargar módulos", err);
+    } finally {
+      setLoading(false);
+    }
   }, [user]);
 
-  const fetchQuizQuestions = async (quizId) => {
+  useEffect(() => {
+    fetchCategorias();
+  }, [fetchCategorias]);
+
+  const fetchQuizQuestions = async (quizId, index) => {
+    if (!quizId) {
+      alert("Este quiz no tiene un ID válido.");
+      return;
+    }
+
     setQuizLoading(true);
+    setCurrentQuizIndexActive(index);
     try {
       const response = await clienteAxios.get(`/quiz/${quizId}/iniciar`);
+      
       setCurrentQuestions(response.data);
       const initial = {};
       response.data.forEach((q) => (initial[q.id] = ""));
@@ -80,7 +96,8 @@ const Modulos = () => {
       setIsQuizActive(true);
       setCurrentQuestionIndex(0);
     } catch (err) {
-      alert("Error al iniciar el quiz.");
+      const mensaje = err.response?.data?.mensaje || err.response?.data?.message || err.response?.data || err.message;
+      alert(`Error al iniciar el quiz: ${mensaje}`);
     } finally {
       setQuizLoading(false);
     }
@@ -92,20 +109,34 @@ const Modulos = () => {
         preguntaId: id,
         respuestaUsuario: userAnswers[id].trim(),
       }));
+      const quizIdActual = selectedQuizIds[currentQuizIndexActive];
       const response = await clienteAxios.post(`/quiz/finalizar`, {
-        quizId: selectedCategoria.quizId,
+        quizId: quizIdActual,
         respuestas: respuestasArray,
       });
       setResultadoQuiz(response.data);
       setShowResultadoModal(true);
       setIsQuizActive(false);
+
+      const puntaje = response.data?.puntaje || 0;
+
+      if (currentQuizIndexActive === 0 && puntaje > QUIZ_PASS_SCORE) {
+        setQuizesCompletados(prev => ({ ...prev, quiz1: true }));
+      } else if (currentQuizIndexActive === 1 && puntaje > QUIZ_PASS_SCORE) {
+        setQuizesCompletados(prev => ({ ...prev, quiz2: true }));
+      } else if (currentQuizIndexActive === 2 && puntaje > FINAL_QUIZ_PASS_SCORE) {
+        setQuizesCompletados(prev => ({ ...prev, quiz3: true }));
+      }
+
+      if (response.data?.categoriaDesbloqueada) {
+        await fetchCategorias();
+      }
     } catch (error) {
       alert("Error al procesar el resultado.");
     }
   };
 
   return (
-
     <div className="layout-wrapper">
       <Sidebar 
         menuItems={userMenu} 
@@ -113,11 +144,8 @@ const Modulos = () => {
         onLogout={() => console.log("Salida")} 
       />
       
-      
       <main className="main-content">
         <Container fluid className="p-4 p-lg-5">
-          
-         
           <div className="mb-4 mb-lg-5">
             <h1 className="fw-bold display-5" style={{ color: "#01579B" }}>
               {isQuizActive ? "Modo Quiz 📝" : "Módulos de Aprendizaje 📚"}
@@ -133,7 +161,6 @@ const Modulos = () => {
               <Spinner animation="grow" variant="primary" />
             </div>
           ) : isQuizActive ? (
-            
             <Row className="justify-content-center animate__animated animate__fadeIn">
               <Col lg={10} xl={8}>
                 <Card className="shadow-lg border-0 rounded-4 overflow-hidden">
@@ -196,20 +223,46 @@ const Modulos = () => {
                       <FaGraduationCap size={60} className="mb-3" />
                       <h2 className="fw-bold mb-3">{selectedCategoria.nombre}</h2>
                       <Badge bg="light" text="primary" pill className="px-3 py-2 fs-6">
-                        {selectedCategoria.vocabulario?.length || 0} Palabras
+                        {selectedCategoria.vocabularios?.length || 0} Palabras
                       </Badge>
                     </div>
                   </Col>
                   <Col md={8}>
                     <Card.Body className="p-4 p-md-5 text-center">
                       <h3 className="mb-4 fw-bold">¿Cómo quieres empezar?</h3>
-                      <div className="d-grid gap-3 d-sm-flex justify-content-center">
+                      <div className="d-grid gap-3 d-sm-flex justify-content-center align-items-center">
                         <Button size="lg" variant="outline-primary" className="px-4 py-3 rounded-pill shadow-sm" onClick={() => setShowVocabularioModal(true)}>
                           📖 Estudiar Vocabulario
                         </Button>
-                        <Button size="lg" variant="primary" className="px-4 py-3 rounded-pill shadow-sm" onClick={() => fetchQuizQuestions(selectedCategoria.quizId)}>
-                          🎯 Iniciar Quiz Final
-                        </Button>
+                        <div className="d-flex flex-column gap-2 w-100 w-sm-auto">
+                          <Button 
+                            size="lg" 
+                            variant={quizesCompletados.quiz1 ? "success" : "primary"}
+                            className="px-4 py-3 rounded-pill shadow-sm" 
+                            onClick={() => fetchQuizQuestions(selectedQuizIds[0], 0)}
+                            disabled={quizLoading || !selectedQuizIds[0]}
+                          >
+                            {quizLoading && currentQuizIndexActive === 0 ? "Cargando..." : quizesCompletados.quiz1 ? "✅ Quiz 1 Completado" : "🎯 Iniciar Quiz 1"}
+                          </Button>
+                          <Button 
+                            size="lg" 
+                            variant={quizesCompletados.quiz2 ? "success" : "primary"} 
+                            className="px-4 py-3 rounded-pill shadow-sm"
+                            onClick={() => fetchQuizQuestions(selectedQuizIds[1], 1)}
+                            disabled={quizLoading || !canStartQuiz2 || !selectedQuizIds[1]}
+                          >
+                            {quizLoading && currentQuizIndexActive === 1 ? "Cargando..." : quizesCompletados.quiz2 ? "✅ Quiz 2 Completado" : !canStartQuiz2 ? "🔒 Quiz 2 (requiere más de 80%)" : "🎯 Iniciar Quiz 2"}
+                          </Button>
+                          <Button 
+                            size="lg" 
+                            variant={quizesCompletados.quiz3 ? "success" : "primary"} 
+                            className="px-4 py-3 rounded-pill shadow-sm"
+                            onClick={() => fetchQuizQuestions(selectedQuizIds[2], 2)}
+                            disabled={quizLoading || !canStartQuiz3 || !selectedQuizIds[2]}
+                          >
+                            {quizLoading && currentQuizIndexActive === 2 ? "Cargando..." : quizesCompletados.quiz3 ? "✅ Quiz Final Completado" : !canStartQuiz3 ? "🔒 Quiz Final (requiere más de 80%)" : "🎯 Iniciar Quiz Final"}
+                          </Button>
+                        </div>
                       </div>
                     </Card.Body>
                   </Col>
@@ -217,7 +270,6 @@ const Modulos = () => {
               </Card>
             </div>
           ) : (
-            
             <Row className="g-4">
               {categorias.map((cat) => (
                 <Col lg={4} md={6} key={cat.id}>
@@ -234,7 +286,7 @@ const Modulos = () => {
                   >
                     <div className="d-flex justify-content-between align-items-start mb-2">
                       <h5 className="fw-bold mb-0 text-truncate" style={{ color: "#01579B", maxWidth: "70%" }}>{cat.nombre}</h5>
-                      <Badge bg="info" pill>{cat.vocabulario?.length || 0} términos</Badge>
+                      <Badge bg="info" pill>{cat.vocabularios?.length || 0} términos</Badge>
                     </div>
                     <p className="text-muted small mb-0 text-truncate-2">{cat.descripcion}</p>
                   </Card>
@@ -245,13 +297,12 @@ const Modulos = () => {
         </Container>
       </main>
 
-     
       <Modal show={showVocabularioModal} onHide={() => setShowVocabularioModal(false)} size="lg" centered scrollable>
         <Modal.Header closeButton className="border-0 bg-light px-4 py-3">
           <Modal.Title className="fw-bold text-truncate">Vocabulario: {selectedCategoria?.nombre}</Modal.Title>
         </Modal.Header>
         <Modal.Body className="px-3 px-md-4">
-          <TableResponsive vocabulario={selectedCategoria?.vocabulario || []} />
+          <TableResponsive vocabulario={selectedCategoria?.vocabularios || []} />
         </Modal.Body>
         <Modal.Footer className="border-0 bg-light">
           <Button variant="secondary" onClick={() => setShowVocabularioModal(false)} className="rounded-pill px-4 w-100 w-sm-auto">Cerrar</Button>

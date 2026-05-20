@@ -3,6 +3,7 @@ package com.example.PAI.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -14,7 +15,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -26,39 +27,67 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
+            // 🔥 DESACTIVAR CSRF (JWT)
             .csrf(AbstractHttpConfigurer::disable)
+
+            // 🔥 CORS
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+            // 🔥 SIN SESIÓN (JWT)
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
+
             .authenticationProvider(authenticationProvider)
-            .authorizeHttpRequests(authorize -> authorize
-                // 1. RUTAS PÚBLICAS
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/usuarios/login", "/api/usuarios/registrar").permitAll()
-                
-                // 2. RUTAS DE ADMINISTRADOR
-               // Cambia esto:
-             // 1. Localiza esta línea:
-.requestMatchers("/api/categorias/**").hasAnyAuthority("admin", "ADMIN", "ROLE_admin", "ROLE_ADMIN")
 
-// 2. Cámbiala por esta (que es más robusta y estándar):
-.requestMatchers("/api/categorias", "/api/categorias/**").hasRole("ADMIN")                  
+            .authorizeHttpRequests(auth -> auth
 
-                // 3. RUTAS DE QUIZ - CUALQUIER USUARIO AUTENTICADO (NUEVO)
-                .requestMatchers("/api/quiz/**").authenticated()
+                // Preflight CORS
+                .requestMatchers(HttpMethod.OPTIONS, "/**")
+                .permitAll()
 
-                // 4. RUTAS COMPARTIDAS (Usuario y Admin)
-                .requestMatchers("/api/quizzes/responder/**").hasAnyRole("USUARIO", "ADMIN")
+                // =========================
+                // 🔓 RUTAS PÚBLICAS
+                // =========================
+                .requestMatchers(
+                        "/api/auth/**",
+                        "/api/usuarios/login",
+                        "/api/usuarios/registrar"
+                ).permitAll()
 
-                // 5. RUTAS DE USUARIO AUTENTICADO
-                .requestMatchers("/api/usuarios/**").authenticated()
+                // =========================
+                // 🔥 SOLO ADMIN
+                // =========================
+                .requestMatchers(
+                        "/api/admin/**",
+                        "/api/categorias/**"
+                ).hasRole("ADMIN")
 
+                // =========================
+                // 🔥 QUIZ (USER + ADMIN)
+                // =========================
+                .requestMatchers("/api/quiz/**")
+                .hasAnyRole("USER", "ADMIN")
 
-                // 6. CUALQUIER OTRA RUTA
-                .anyRequest().authenticated()
+                .requestMatchers("/api/quizzes/responder/**")
+                .hasAnyRole("USER", "ADMIN")
+
+                // =========================
+                // 🔐 USUARIOS AUTENTICADOS
+                // =========================
+                .requestMatchers("/api/usuarios/**")
+                .authenticated()
+
+                // =========================
+                // 🔒 RESTO
+                // =========================
+                .anyRequest()
+                .authenticated()
             )
+
+            // 🔥 FILTRO JWT
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -66,14 +95,37 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(Arrays.asList("http://localhost:3000", "*"));
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Cache-Control"));
+
+        config.setAllowedOriginPatterns(List.of(
+                "http://localhost:3000",
+                "http://localhost:3001",
+                "https://*.up.railway.app"
+        ));
+
+        config.setAllowedMethods(List.of(
+                "GET", "POST", "PUT", "DELETE", "OPTIONS"
+        ));
+
+        config.setAllowedHeaders(List.of(
+                "Authorization",
+                "Content-Type",
+                "Cache-Control",
+                "X-Requested-With",
+                "Accept",
+                "Origin"
+        ));
+
+        config.setExposedHeaders(List.of("Authorization"));
+
         config.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+
         source.registerCorsConfiguration("/**", config);
+
         return source;
     }
 }

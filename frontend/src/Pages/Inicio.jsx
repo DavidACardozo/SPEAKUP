@@ -44,15 +44,13 @@ function Inicio() {
       if (!user?.id) return;
       try {
         setLoading(true);
-        const response = await clienteAxios.get(
-          `/usuarios/${user.id}/categorias-desbloqueadas`,
-        );
+        const response = await clienteAxios.get(`/usuarios/${user.id}/categorias-desbloqueadas`,);
         const infoMapeada = response.data
           .map((cat) => ({
             id: cat.id,
             nombre: cat.nombre,
             nivel: cat.descripcion,
-            palabras: cat.vocabulario ? cat.vocabulario.length : 0,
+            palabras: cat.vocabularios ? cat.vocabularios.length : 0,
             estado: cat.completada ? "Completado" : "En Curso",
           }))
           .sort((a, b) => a.id - b.id);

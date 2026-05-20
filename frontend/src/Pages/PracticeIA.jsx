@@ -68,7 +68,7 @@ const PracticeWithIA = () => {
                     <div className="text-center">
                       <h2 className="fw-bold">{selectedCategoria.nombre}</h2>
                       <Badge bg="light" text="primary" pill className="px-3 py-2 mt-2">
-                        {selectedCategoria.vocabulario?.length || 0} Palabras
+                        {selectedCategoria.vocabularios?.length || 0} Palabras
                       </Badge>
                     </div>
                   </Col>
@@ -111,7 +111,7 @@ const PracticeWithIA = () => {
           <Modal.Title className="fw-bold text-primary">Diccionario: {selectedCategoria?.nombre}</Modal.Title>
         </Modal.Header>
         <Modal.Body className="px-4">
-          {selectedCategoria?.vocabulario?.map((v, i) => (
+          {selectedCategoria?.vocabularios?.map((v, i) => (
             <div key={i} className="d-flex justify-content-between align-items-center py-3 border-bottom">
               <div>
                 <span className="fw-bold fs-5 d-block text-dark">{v.palabraIngles}</span>
@@ -129,4 +129,4 @@ const PracticeWithIA = () => {
   );
 };
 
-export default PracticeWithIA;
+export default PracticeWithIA;  

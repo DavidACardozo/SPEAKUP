@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/quiz")
@@ -24,12 +25,12 @@ public class QuizController {
     private final UsuarioQuizService usuarioQuizService;
 
     @GetMapping("/{quizId}/iniciar")
-    public ResponseEntity<List<PreguntaQuizDTO>> iniciarQuiz(@PathVariable String quizId) {
+    public ResponseEntity<?> iniciarQuiz(@PathVariable String quizId) {
         try {
             List<PreguntaQuizDTO> preguntas = quizService.iniciarQuiz(quizId);
             return ResponseEntity.ok(preguntas);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("mensaje", e.getMessage()));
         }
     }
 

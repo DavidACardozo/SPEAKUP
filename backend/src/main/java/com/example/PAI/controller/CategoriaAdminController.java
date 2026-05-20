@@ -61,18 +61,27 @@ public ResponseEntity<?> eliminarCategoria(@PathVariable String id) {
     }
 }
 
-    // 🔥 NUEVO → ACTUALIZAR CATEGORÍA
+// 🔥 ACTUALIZAR CATEGORÍA + VOCABULARIO + QUIZZES
 @PutMapping("/{id}")
 public ResponseEntity<?> actualizarCategoria(
         @PathVariable String id,
         @RequestBody CrearCategoriaDTO request) {
 
     try {
-        return ResponseEntity.ok(
-            adminService.actualizarCategoria(id, request.getNombre(), request.getDescripcion())
-        );
+
+        CategoriaCompletaDTO categoriaActualizada =
+                categoriaService.actualizarCategoriaCompleta(id, request);
+
+        return ResponseEntity.ok(categoriaActualizada);
+
     } catch (Exception e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
+
+        return ResponseEntity.badRequest().body(
+                Map.of(
+                        "mensaje", "Error actualizando categoría",
+                        "error", e.getMessage()
+                )
+        );
     }
 }
 }

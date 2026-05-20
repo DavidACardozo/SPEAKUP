@@ -19,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UsuarioQuizService {
 
+    private static final double PUNTAJE_DESBLOQUEO_CATEGORIA = 90.0;
+
     private final UsuarioRepository usuarioRepository;
     private final QuizRepository quizRepository;
     private final CategoriaRepository categoriaRepository;
@@ -82,26 +84,39 @@ public class UsuarioQuizService {
     }
 
     private boolean desbloquearSiguienteCategoriaSiAplica(Usuario usuario, Quiz quiz, double puntaje) {
-        if (puntaje >= 100.0) {
-            Optional<Categoria> categoriaActualOpt = categoriaRepository.findByQuizId(quiz.getId());
-            if (categoriaActualOpt.isPresent()) {
-                int nivelSiguiente = categoriaActualOpt.get().getNivel() + 1;
-                Optional<Categoria> siguienteOpt = categoriaRepository.findByNivel(nivelSiguiente);
-                if (siguienteOpt.isPresent()) {
-                    Categoria siguiente = siguienteOpt.get();
-                    
-                    // Verificar si ya está desbloqueada desde la lista embebida del usuario
-                    boolean yaDesbloqueada = usuario.getCategorias().stream()
-                            .filter(uc -> uc.getCategoriaId().equals(siguiente.getId()))
-                            .findFirst()
-                            .map(UsuarioCategoria::isDesbloqueada)
-                            .orElse(false);
-                            
-                    if (!yaDesbloqueada) {
-                        usuarioCategoriaService.desbloquearCategoria(usuario, siguiente);
-                        return true;
-                    }
-                }
+        if (puntaje <= PUNTAJE_DESBLOQUEO_CATEGORIA) {
+            return false;
+        }
+
+        Optional<Categoria> categoriaActualOpt = categoriaRepository.findByQuizId(quiz.getId());
+        if (categoriaActualOpt.isEmpty()) {
+            return false;
+        }
+
+        Categoria categoriaActual = categoriaActualOpt.get();
+        if (categoriaActual.getQuizIds() == null || categoriaActual.getQuizIds().isEmpty()) {
+            return false;
+        }
+
+        String quizFinalId = categoriaActual.getQuizIds().get(categoriaActual.getQuizIds().size() - 1);
+        if (!quizFinalId.equals(quiz.getId())) {
+            return false;
+        }
+
+        int nivelSiguiente = categoriaActual.getNivel() + 1;
+        Optional<Categoria> siguienteOpt = categoriaRepository.findByNivel(nivelSiguiente);
+        if (siguienteOpt.isPresent()) {
+            Categoria siguiente = siguienteOpt.get();
+
+            boolean yaDesbloqueada = usuario.getCategorias().stream()
+                    .filter(uc -> uc.getCategoriaId().equals(siguiente.getId()))
+                    .findFirst()
+                    .map(UsuarioCategoria::isDesbloqueada)
+                    .orElse(false);
+
+            if (!yaDesbloqueada) {
+                usuarioCategoriaService.desbloquearCategoria(usuario, siguiente);
+                return true;
             }
         }
         return false;

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-// 1. Cambiamos axios por tu configuración centralizada
 import clienteAxios from "../Api/axiosConfig";
 import {
   Container,
@@ -19,8 +18,10 @@ const Registro = () => {
     nombre: "",
     apellido: "",
     email: "",
+    password: "",
   });
 
+  const [confirmarPassword, setConfirmarPassword] = useState("");
   const [respuesta, setRespuesta] = useState(null);
   const [error, setError] = useState(null);
   const [cargando, setCargando] = useState(false);
@@ -43,15 +44,17 @@ const Registro = () => {
     setError(null);
     setRespuesta(null);
 
-    const dataToSend = {
-      ...formData,
-      password: "password-dummy-react-client",
-    };
+    if (formData.password !== confirmarPassword) {
+      setError("Las contraseñas no coinciden.");
+      setCargando(false);
+      return;
+    }
 
     try {
-      const response = await clienteAxios.post("/auth/registro", dataToSend);
+      const response = await clienteAxios.post("/auth/registro", formData);
       setRespuesta(response.data);
-      setFormData({ nombre: "", apellido: "", email: "" });
+      setFormData({ nombre: "", apellido: "", email: "", password: "" });
+      setConfirmarPassword("");
     } catch (err) {
       const mensajeError =
         err.response?.data?.mensaje || "Error al registrar el usuario.";
@@ -94,23 +97,8 @@ const Registro = () => {
                       <h5 className="mb-0 fw-bold">¡Registro Exitoso!</h5>
                     </div>
                     <p>
-                      Hola <strong>{formData.nombre || "estudiante"}</strong>,
-                      usa estos datos para entrar:
+                      ¡Tu cuenta ha sido creada correctamente! Ya puedes iniciar sesión con tus credenciales.
                     </p>
-                    <div className="bg-white p-3 rounded border shadow-sm my-3">
-                      <div className="d-flex justify-content-between mb-2">
-                        <span>Usuario:</span>
-                        <code className="bg-light px-2 py-1 rounded text-primary fw-bold fs-6">
-                          {respuesta.username}
-                        </code>
-                      </div>
-                      <div className="d-flex justify-content-between">
-                        <span>Contraseña:</span>
-                        <code className="bg-light px-2 py-1 rounded text-primary fw-bold fs-6">
-                          {respuesta.password}
-                        </code>
-                      </div>
-                    </div>
                     <Button
                       variant="success"
                       className="w-100 fw-bold"
@@ -162,6 +150,32 @@ const Registro = () => {
                       placeholder="correo@ejemplo.com"
                       value={formData.email}
                       onChange={handleChange}
+                      required
+                      disabled={cargando}
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-4">
+                    <Form.Label>Contraseña</Form.Label>
+                    <Form.Control
+                      type="password"
+                      name="password"
+                      placeholder="Crea una contraseña"
+                      value={formData.password}
+                      onChange={handleChange}
+                      required
+                      disabled={cargando}
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-4">
+                    <Form.Label>Confirmar Contraseña</Form.Label>
+                    <Form.Control
+                      type="password"
+                      name="confirmarPassword"
+                      placeholder="Repite tu contraseña"
+                      value={confirmarPassword}
+                      onChange={(e) => setConfirmarPassword(e.target.value)}
                       required
                       disabled={cargando}
                     />

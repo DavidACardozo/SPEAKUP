@@ -40,18 +40,25 @@ public class AdminService {
     }
 
     public String eliminarCategoria(String id) {
-        Categoria categoria = categoriaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
 
-        // eliminar quiz asociado
-        if (categoria.getQuizId() != null) {
-            quizRepository.deleteById(categoria.getQuizId());
+    Categoria categoria = categoriaRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
+
+    // =====================================================
+    // 🔥 ELIMINAR TODOS LOS QUIZZES DE LA CATEGORÍA
+    // =====================================================
+    if (categoria.getQuizIds() != null) {
+
+        for (String quizId : categoria.getQuizIds()) {
+            quizRepository.deleteById(quizId);
         }
-
-        categoriaRepository.deleteById(id);
-
-        return "Categoría y quiz eliminados";
     }
+
+    // eliminar categoría
+    categoriaRepository.deleteById(id);
+
+    return "Categoría y quizzes eliminados";
+}
 
     // =========================
     // 📌 QUIZZES

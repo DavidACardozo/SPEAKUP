@@ -28,7 +28,9 @@ public class Usuario implements UserDetails {
 
     private String nombre;
     private String apellido;
-    private String rol; // "admin" o "usuario"
+
+    // ADMIN o USER
+    private String rol;
 
     @Indexed(unique = true)
     private String email;
@@ -40,20 +42,68 @@ public class Usuario implements UserDetails {
 
     private Date fechaRegistro = new Date();
 
-    private List<UsuarioQuiz> intentos = new ArrayList<>();         // ← embebido 
-    private List<UsuarioCategoria> categorias = new ArrayList<>();  // ← embebido 
+    // 🔥 QUIZZES DESBLOQUEADOS
+    private List<String> quizzesDesbloqueados = new ArrayList<>();
 
-    // MÉTODOS DE USERDETAILS — no tocar, JWT depende de esto
+    // 🔥 HISTORIAL DE QUIZZES
+    private List<UsuarioQuiz> intentos = new ArrayList<>();
+
+    // 🔥 CATEGORÍAS DESBLOQUEADAS
+    private List<UsuarioCategoria> categorias = new ArrayList<>();
+
+    // =========================
+    // 🔐 USERDETAILS
+    // =========================
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + rol.toUpperCase()));
+        return List.of(
+                new SimpleGrantedAuthority("ROLE_" + normalizarRol())
+        );
     }
 
-    @Override public String getUsername() { return email; }
-    @Override public String getPassword() { return password; }
-    @Override public boolean isAccountNonExpired() { return true; }
-    @Override public boolean isAccountNonLocked() { return true; }
-    @Override public boolean isCredentialsNonExpired() { return true; }
-    @Override public boolean isEnabled() { return true; }
+    private String normalizarRol() {
+        if (rol == null) {
+            return "USER";
+        }
+
+        String rolNormalizado = rol.trim().toUpperCase();
+        if (rolNormalizado.equals("USUARIO")) {
+            return "USER";
+        }
+        if (rolNormalizado.equals("ADMINISTRADOR")) {
+            return "ADMIN";
+        }
+        return rolNormalizado;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }

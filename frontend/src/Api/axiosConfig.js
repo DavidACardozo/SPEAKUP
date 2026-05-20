@@ -1,8 +1,10 @@
 import axios from 'axios';
 
+const runtimeApiUrl = window._env_?.REACT_APP_API_URL;
+
 // 1. Configuramos la URL base de tu backend de Spring Boot
 const clienteAxios = axios.create({
-    baseURL: 'http://localhost:8083/api'
+    baseURL: runtimeApiUrl || process.env.REACT_APP_API_URL || 'http://localhost:8083/api'
 });
 
 // 2. El Interceptor: Este código se ejecuta ANTES de cada petición

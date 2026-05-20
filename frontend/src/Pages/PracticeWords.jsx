@@ -73,14 +73,14 @@ const IAChallengePage = () => {
                     <span>Reto de gramática y contexto</span>
                   </div>
                   <Badge bg="light" text="primary" pill className="px-3 py-2 fs-6">
-                    {selectedCategoria.vocabulario?.length || 0} palabras disponibles
+                    {selectedCategoria.vocabularios?.length || 0} palabras disponibles
                   </Badge>
                 </Card.Body>
               </Card>
 
               <EjercicioIA 
                 categoria={selectedCategoria.nombre} 
-                vocabulario={selectedCategoria.vocabulario} 
+                vocabulario={selectedCategoria.vocabularios} 
               />
             </div>
           ) : (

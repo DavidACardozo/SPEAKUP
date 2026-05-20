@@ -40,20 +40,24 @@ public class UsuarioCategoriaService {
                                 return dto;
                             })
                             .collect(Collectors.toList());
-
-                    boolean completada = usuario.getIntentos().stream()
-                            .anyMatch(intento ->
-                                intento.getQuizId() != null &&
-                                intento.getQuizId().equals(c.getQuizId()) &&
-                                intento.getPuntaje() >= 70
-                            );
+// =====================================================
+// 🔥 VERIFICAR SI EL USUARIO COMPLETÓ ALGÚN QUIZ
+// DE ESTA CATEGORÍA
+// =====================================================
+      boolean completada = usuario.getIntentos().stream()
+        .anyMatch(intento ->
+            c.getQuizIds() != null
+            && intento.getQuizId() != null
+            && c.getQuizIds().contains(intento.getQuizId())
+            && intento.getPuntaje() >= 70
+        );
 
                     return new CategoriaDesbloqueadaResponseDTO(
                             c.getId(),
                             c.getNombre(),
                             c.getDescripcion(),
                             c.getNivel(),
-                            c.getQuizId(),
+                            c.getQuizIds(),
                             vocabularioDTO,
                             completada);
                 })

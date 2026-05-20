@@ -11,8 +11,8 @@ public interface CategoriaRepository extends MongoRepository<Categoria, String> 
 
     Optional<Categoria> findFirstByOrderByNivelDesc();
 
-    // ✅ Corregido — quizId es campo directo en el documento
-    @Query("{ 'quizId': ?0 }")
+    // Busca la categoria que contiene este quiz dentro de su lista de quizzes.
+    @Query("{ 'quizIds': ?0 }")
     Optional<Categoria> findByQuizId(String quizId);
 
     Optional<Categoria> findByNivel(int nivel);
