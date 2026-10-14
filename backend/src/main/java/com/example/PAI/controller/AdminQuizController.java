@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/admin/quizzes")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class AdminQuizController {
 
     private final QuizRepository quizRepository;

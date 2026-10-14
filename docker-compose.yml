@@ -1,17 +1,14 @@
 services:
   mongodb_speakup:
-    image: mongo:latest
+    image: andressantanaf/speakup-mongo:latest
     container_name: mongodb_speakup
     ports:
       - "27018:27017"
     volumes:
-      - ./mongo-data:/data/db
+      - mongo_data_docker:/data/db
 
   api_speakup:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    image: speakup-api:local
+    image: andressantanaf/speakup-backend:latest
     container_name: api_speakup
     ports:
       - "8084:8083"
@@ -21,14 +18,15 @@ services:
       SPRING_DATA_MONGODB_URI: mongodb://mongodb_speakup:27017/speakup_db
 
   frontend_speakup:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        REACT_APP_API_URL: http://localhost:8084/api
-    image: speakup-frontend:local
+    image: andressantanaf/speakup-frontend:latest
     container_name: frontend_speakup
     ports:
       - "3000:80"
     depends_on:
       - api_speakup
+    environment:
+      REACT_APP_API_URL: http://localhost:8084/api
+      PORT: "80"
+
+volumes:
+  mongo_data_docker:
