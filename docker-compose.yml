@@ -18,6 +18,7 @@ services:
       SPRING_DATA_MONGODB_URI: mongodb://mongodb_speakup:27017/speakup_db
 
   frontend_speakup:
+    build: ./frontend
     image: andressantanaf/speakup-frontend:latest
     container_name: frontend_speakup
     ports:
