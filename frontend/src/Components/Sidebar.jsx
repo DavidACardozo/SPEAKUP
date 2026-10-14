@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { createPortal } from "react-dom";
 import { Offcanvas, Nav, Button } from "react-bootstrap";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaSignOutAlt, FaBars } from "react-icons/fa";
@@ -68,7 +69,9 @@ const Sidebar = ({ menuItems = [], onLogout }) => {
     </div>
   );
 
-  return (
+  // Se renderiza en <body> para que la animación de cambio de página (transform)
+  // no desplace la barra fija ni la haga aparecer duplicada durante la transición.
+  return createPortal(
     <>
       {/* Botón Flotante para Pantallas Móviles */}
       <div
@@ -204,7 +207,8 @@ const Sidebar = ({ menuItems = [], onLogout }) => {
           }
         }
       `}</style>
-    </>
+    </>,
+    document.body
   );
 };
 

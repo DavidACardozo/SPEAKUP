@@ -13,9 +13,7 @@ public class CorsConfig implements WebMvcConfigurer {
                 .allowedOriginPatterns(
                         "http://localhost:3000",
                         "http://localhost:3001",
-                        "https://*.up.railway.app",
-                        "https://speakup-frontend-production.up.railway.app/"
-                        )
+                        "https://*.up.railway.app")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);

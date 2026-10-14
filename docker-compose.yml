@@ -9,7 +9,7 @@ services:
 
   api_speakup:
     build: ./backend
-    image: andressantanaf/speakup-backend:latest
+    image: davidacardozo/speakup-backend:latest
     pull_policy: build
     container_name: api_speakup
     ports:
@@ -21,7 +21,7 @@ services:
 
   frontend_speakup:
     build: ./frontend
-    image: andressantanaf/speakup-frontend:latest
+    image: davidacardozo/speakup-frontend:latest
     pull_policy: build
     container_name: frontend_speakup
     ports:
