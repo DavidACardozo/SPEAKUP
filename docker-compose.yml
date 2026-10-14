@@ -18,6 +18,8 @@ services:
       - mongodb_speakup
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://mongodb_speakup:27017/speakup_db
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      IA_MODEL: ${IA_MODEL:-qwen/qwen3.8-27b}
 
   frontend_speakup:
     build: ./frontend

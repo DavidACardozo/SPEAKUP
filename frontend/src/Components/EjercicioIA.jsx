@@ -21,7 +21,7 @@ const EjercicioIA = ({ categoria, vocabulario }) => {
     setDatos(azar);
     setRespuestasUsuario({});
     setResultado(null);
-    setErrorLocal("Servidor ocupado. Usando retos locales.");
+    setErrorLocal("IA no disponible. Usando retos locales.");
   }, [categoria]);
 
   // 2. Cargar Reto (Con limpieza de estado crítica)
