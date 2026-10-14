@@ -1,6 +1,7 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { Container } from "react-bootstrap";
+import { AnimatePresence } from "framer-motion";
 
 import Registro from "./Pages/Registro";
 import Login from "./Pages/Login";
@@ -17,7 +18,8 @@ import { AuthProvider, useAuth } from "./Context/AuthContext";
 import Layout from "./Components/Layout";
 import PracticaIA from "./Pages/PracticeIA";
 import GestionDeQuizes from "./Pages/Admin/GestionDeQuizes";
-import ResumenUsuario from "./Pages/Admin/ResumenUsuario"
+import ResumenUsuario from "./Pages/Admin/ResumenUsuario";
+import Landingpage from "./Pages/Landingpage";
 
 const AdminRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -32,76 +34,87 @@ const AdminRoute = ({ children }) => {
   return children;
 };
 
+// Subcomponente para manejar las rutas animadas con el hook useLocation
+function AnimatedRoutes() {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        {/* 1. Rutas públicas */}
+        <Route path="/" element={<Landingpage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/registro" element={<Registro />} />
+
+        {/* 2. Ruta de Admin Protegida por ROL */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminRoute>
+                <AdminPanel />
+              </AdminRoute>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/usuarios"
+          element={
+            <ProtectedRoute>
+              <AdminRoute>
+                <AdminUsuarios />
+              </AdminRoute>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/Quiz"
+          element={
+            <ProtectedRoute>
+              <AdminRoute>
+                <GestionDeQuizes />
+              </AdminRoute>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* 3. Rutas de Usuario Protegidas con Layout */}
+        <Route
+          element={
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/inicio" element={<Inicio />} />
+          <Route path="/modulos" element={<Modulos />} />
+          <Route path="/perfil" element={<Perfil />} />
+          <Route path="/historial-quizes" element={<Historial />} />
+          <Route path="/PracticeWithIA" element={<PracticaIA />} />
+          <Route path="/PracticeWords" element={<PracticaWords />} />
+          <Route path="/usuarios/:usuarioId" element={<ResumenUsuario />} />
+        </Route>
+
+        {/* Error 404 */}
+        <Route
+          path="*"
+          element={
+            <Container className="mt-5 text-center">
+              <h2>Error 404: Página No Encontrada</h2>
+              <p>Parece que te has perdido en el vocabulario.</p>
+            </Container>
+          }
+        />
+      </Routes>
+    </AnimatePresence>
+  );
+}
+
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Routes>
-          {/* 1. Rutas públicas */}
-          <Route path="/" element={<Login />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/registro" element={<Registro />} />
-
-          {/* 2. Ruta de Admin Protegida por ROL */}
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute>
-                <AdminRoute>
-                  <AdminPanel />
-                </AdminRoute>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/usuarios"
-            element={
-              <ProtectedRoute>
-                <AdminRoute>
-                  <AdminUsuarios />
-                </AdminRoute>
-              </ProtectedRoute>
-            }
-          />
-             <Route
-            path="/Quiz"
-            element={
-              <ProtectedRoute>
-                <AdminRoute>
-                  <GestionDeQuizes />
-                </AdminRoute>
-              </ProtectedRoute>
-            }
-          />
-
-          {/* 3. Rutas de Usuario Protegidas con Layout */}
-          <Route
-            element={
-              <ProtectedRoute>
-                <Layout />
-              </ProtectedRoute>
-            }
-          >
-            <Route path="/inicio" element={<Inicio />} />
-            <Route path="/modulos" element={<Modulos />} />
-            <Route path="/perfil" element={<Perfil />} />
-            <Route path="/historial-quizes" element={<Historial />} />
-            <Route path="/PracticeWithIA" element={<PracticaIA />} />
-            <Route path="/PracticeWords" element={<PracticaWords />} />
-            <Route path="/usuarios/:usuarioId" element={<ResumenUsuario />} />
-          </Route>
-
-          {/* Error 404 */}
-          <Route
-            path="*"
-            element={
-              <Container className="mt-5 text-center">
-                <h2>Error 404: Página No Encontrada</h2>
-                <p>Parece que te has perdido en el vocabulario.</p>
-              </Container>
-            }
-          />
-        </Routes>
+        <AnimatedRoutes />
       </BrowserRouter>
     </AuthProvider>
   );

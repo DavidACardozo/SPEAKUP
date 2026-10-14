@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-// 🔥 Se eliminó la coma extra después de Spinner
 import { Container, Button, Card, Row, Col, Badge, Spinner } from "react-bootstrap"; 
 import { FaHome, FaLayerGroup, FaUserCircle, FaBookOpen, FaMicrophone, FaArrowLeft, FaPencilAlt } from "react-icons/fa";
 import Sidebar from "../Components/Sidebar";

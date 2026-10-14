@@ -84,7 +84,7 @@ const PracticeWithIA = () => {
                 </Row>
               </Card>
 
-              {/* 🔥 Se eliminó la etiqueta <EjercicioIA /> de aquí */}
+              
             </div>
           ) : (
             <Row className="g-4">
