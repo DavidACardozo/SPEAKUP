@@ -13,7 +13,7 @@ import {
   Row,
   Col,
 } from "react-bootstrap";
-import LOGO from "../Assets/logonew.png";
+import LOGO from "../Assets/LOGONEW.png";
 import { useAuth } from "../Context/AuthContext";
 
 const Login = () => {
