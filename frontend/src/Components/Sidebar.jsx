@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import { Offcanvas, Nav, Button } from "react-bootstrap";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaSignOutAlt, FaBars } from "react-icons/fa";
+import LOGO from "../Assets/LOGO.png";
 
 
 const Sidebar = ({ 
   menuItems = [], 
-  brand = { name: "App", logo: "🚀" }, 
+  brand = { name: "App" }, 
   onLogout 
 }) => {
   const [show, setShow] = useState(false);
@@ -52,10 +53,12 @@ const Sidebar = ({
     <div className="d-flex flex-column h-100">
       <div className="p-3 text-center flex-shrink-0">
         <div className="d-flex align-items-center justify-content-center gap-2 mb-1">
-          <span style={{ fontSize: "2rem" }}>{brand.logo}</span>
-          <h3 className="m-0 fw-bold" style={{ color: "#01579B" }}>
-            {brand.name}
-          </h3>
+          <img src={LOGO} alt="SpeakUp Logo" style={{ width: "100%", maxWidth: "220px", height: "auto" }} />
+          {brand.name && (
+            <h3 className="m-0 fw-bold" style={{ color: "#01579B" }}>
+              {brand.name}
+            </h3>
+          )}
         </div>
         <hr style={{ borderColor: "#81D4FA" }} />
       </div>

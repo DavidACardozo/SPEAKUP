@@ -13,7 +13,7 @@ import {
   Row,
   Col,
 } from "react-bootstrap";
-import LOGO from "../Assets/LOGONEW.png";
+import LOGO from "../Assets/LOGO.png";
 import { useAuth } from "../Context/AuthContext";
 
 const Login = () => {
@@ -75,7 +75,7 @@ const Login = () => {
         <Row className="align-items-center min-vh-100">
           <Col md={6} className="d-none d-md-block">
             <div className="illustration-box text-center">
-              <img src={LOGO} alt="SpeakUp Logo" className="illustration-img mb-4" style={{maxWidth: '250px'}} />
+              <img src={LOGO} alt="SpeakUp Logo" className="illustration-img mb-4" style={{maxWidth: '400px'}} />
               <h3 className="illustration-text">¡Bienvenido!</h3>
               <p>Continúa tu camino hacia la fluidez en inglés.</p>
             </div>

@@ -10,6 +10,7 @@ import {
   Badge,
 } from "react-bootstrap";
 import clienteAxios from "../Api/axiosConfig";
+import LOGO from "../Assets/LOGO.png";
 import { useAuth } from "../Context/AuthContext";
 import {
   FaHome,
@@ -119,7 +120,7 @@ const Perfil = () => {
     <Container fluid className="py-4">
       <Sidebar
         menuItems={userMenu}
-        brand={{ name: "SpeakUp! W&B", logo: "🦉" }}
+        brand={{}}
         onLogout={() => console.log("Usuario saliendo...")}
       />
       <Row className="justify-content-center">
@@ -154,7 +155,7 @@ const Perfil = () => {
                       margin: "0 auto",
                     }}
                   >
-                    🦉
+                    <img src={LOGO} alt="SpeakUp Logo" style={{ width: "95%", height: "95%", objectFit: "contain", verticalAlign: "middle" }} />
                   </div>
                 </Col>
                 <Col xs={12} md={9} className="text-center text-md-start">

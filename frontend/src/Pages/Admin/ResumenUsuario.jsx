@@ -109,7 +109,7 @@ const DetalleUsuario = () => {
     <div className="d-flex w-100 style-wrapper">
       <Sidebar
         menuItems={userMenu}
-        brand={{ name: "SpeakUp! W&B", logo: "🦉" }}
+        brand={{}}
         onLogout={logout}
       />
 

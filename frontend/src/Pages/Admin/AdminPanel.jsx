@@ -393,7 +393,7 @@ const AdminPanel = () => {
 
   return (
     <div style={{ display: "flex" }}>
-      <Sidebar menuItems={userMenu} brand={{ name: "SpeakUp! W&B", logo: "🦉" }} onLogout={logout} />
+      <Sidebar menuItems={userMenu} brand={{}} onLogout={logout} />
 
       <div
         className="container-fluid"

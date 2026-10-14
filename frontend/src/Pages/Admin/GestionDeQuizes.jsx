@@ -88,7 +88,7 @@ const GestionDeQuizes = () => {
     <div style={{ display: "flex" }}>
       <Sidebar
         menuItems={userMenu}
-        brand={{ name: "SpeakUp! W&B", logo: "🦉" }}
+        brand={{}}
         onLogout={logout}
       />
       

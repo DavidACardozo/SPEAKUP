@@ -10,7 +10,7 @@ import {
   Row,
   Col,
 } from "react-bootstrap";
-import LOGO from "../Assets/LOGONEW.png";
+import LOGO from "../Assets/LOGO.png";
 import { useNavigate } from "react-router-dom";
 
 const Registro = () => {

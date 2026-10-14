@@ -140,7 +140,7 @@ const Modulos = () => {
     <div className="layout-wrapper">
       <Sidebar 
         menuItems={userMenu} 
-        brand={{ name: "SpeakUp!", logo: "🦉" }} 
+        brand={{}} 
         onLogout={() => console.log("Salida")} 
       />
       

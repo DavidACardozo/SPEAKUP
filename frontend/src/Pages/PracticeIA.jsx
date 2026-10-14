@@ -44,7 +44,7 @@ const PracticeWithIA = () => {
 
   return (
     <div className="layout-wrapper">
-      <Sidebar menuItems={userMenu} brand={{ name: "SpeakUp!", logo: "🦉" }} onLogout={() => {}} />
+      <Sidebar menuItems={userMenu} brand={{}} onLogout={() => {}} />
       <main className="main-content">
         <Container fluid className="p-4 p-lg-5">
           <h1 className="fw-bold display-5" style={{ color: "#01579B" }}>
