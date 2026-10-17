@@ -1,6 +1,8 @@
 services:
   mongodb_speakup:
-    image: andressantanaf/speakup-mongo:latest
+    build: ./database
+    image: davidacardozo/speakup-mongo:latest
+    pull_policy: build
     container_name: mongodb_speakup
     ports:
       - "27018:27017"

@@ -16,4 +16,6 @@ public interface CategoriaRepository extends MongoRepository<Categoria, String> 
     Optional<Categoria> findByQuizId(String quizId);
 
     Optional<Categoria> findByNivel(int nivel);
+
+    boolean existsByNombreIgnoreCase(String nombre);
 }

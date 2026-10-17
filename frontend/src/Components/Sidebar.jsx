@@ -200,12 +200,13 @@ const Sidebar = ({ menuItems = [], onLogout }) => {
           color: #EF4444 !important;
         }
 
-        /* Ajuste de margen para el contenedor de las páginas */
+        /* Ajuste de margen para el contenedor de las páginas (desactivado)
         @media (min-width: 992px) {
           .main-content {
             margin-left: 260px;
           }
         }
+        */
       `}</style>
     </>,
     document.body
