@@ -8,6 +8,9 @@ import {
   FaLock,
   FaCheck,
   FaTimes,
+  FaRecycle,
+  FaSchool,
+  FaUniversity,
 } from "react-icons/fa";
 import ImagoTipo, { IsoTipo, LogoTipo } from "../Components/Logo";
 // 1. Importas el componente reutilizable de animación
@@ -42,6 +45,27 @@ const COMPARACION = [
   ["Contexto", "Contenido genérico para todo el mundo", "Pensada para hispanohablantes en Colombia"],
 ];
 
+const CONVENIOS = [
+  {
+    icon: <FaRecycle />,
+    titulo: "Empresas de reciclaje",
+    texto:
+      "Por contribuir con reciclaje recibes un código de membresía por un tiempo, según los kilos que aportes.",
+  },
+  {
+    icon: <FaSchool />,
+    titulo: "Colegios",
+    texto:
+      "Llevamos SpeakUp a las aulas para reforzar el vocabulario en inglés de los estudiantes.",
+  },
+  {
+    icon: <FaUniversity />,
+    titulo: "Universidades",
+    texto:
+      "Acompañamos a estudiantes universitarios en el inglés que piden sus programas.",
+  },
+];
+
 const LandingPage = () => {
   return (
     <PageTransition>
@@ -55,6 +79,7 @@ const LandingPage = () => {
             <nav className="su-nav-links" aria-label="Principal">
               <a href="#como-funciona">Cómo funciona</a>
               <a href="#diferencias">Por qué SpeakUp</a>
+              <a href="#convenios">Convenios</a>
             </nav>
 
             <div className="d-flex align-items-center gap-2">
@@ -165,6 +190,32 @@ const LandingPage = () => {
                   </table>
                 </div>
               </Col>
+            </Row>
+          </Container>
+        </section>
+
+        <section id="convenios" className="su-section su-section-celeste">
+          <Container>
+            <div className="su-section-head">
+              <p className="su-kicker mb-2">Convenios</p>
+              <h2 className="su-h2">Aprender inglés también suma para tu comunidad</h2>
+              <p>
+                Tenemos alianzas con empresas de reciclaje, colegios y
+                universidades para que más personas puedan alzar su voz en
+                inglés. Muy pronto te contaremos más.
+              </p>
+            </div>
+
+            <Row className="g-4">
+              {CONVENIOS.map((c) => (
+                <Col md={4} key={c.titulo}>
+                  <article className="su-step">
+                    <span className="su-step-icon">{c.icon}</span>
+                    <h3 className="mt-3">{c.titulo}</h3>
+                    <p>{c.texto}</p>
+                  </article>
+                </Col>
+              ))}
             </Row>
           </Container>
         </section>
