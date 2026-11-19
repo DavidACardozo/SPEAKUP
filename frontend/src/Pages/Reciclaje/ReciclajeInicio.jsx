@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Alert, Button, Card, Col, Container, Form, Row, Spinner } from "react-bootstrap";
-import { FaArrowRight, FaRecycle, FaWeightHanging } from "react-icons/fa";
+import { FaArrowRight, FaChartLine, FaRecycle, FaWeightHanging } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import Sidebar from "../../Components/Sidebar";
 import PageTransition from "../../Components/PageTransition";
@@ -33,8 +33,8 @@ const ReciclajeInicio = () => {
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [valoresHistoricos, setValoresHistoricos] = useState("");
-  const [pasosFuturos, setPasosFuturos] = useState(1);
+  const [valoresHistoricos, setValoresHistoricos] = useState("2.0, 3.5, 4.2, 5.8");
+  const [periodoFuturo, setPeriodoFuturo] = useState(5);
   const [proyeccion, setProyeccion] = useState(null);
   const [calculandoProyeccion, setCalculandoProyeccion] = useState(false);
   const [errorProyeccion, setErrorProyeccion] = useState(null);
@@ -55,6 +55,14 @@ const ReciclajeInicio = () => {
     return () => { mounted = false; };
   }, []);
 
+  useEffect(() => {
+    let mounted = true;
+    recyclingService.proyectarReciclaje([2.0, 3.5, 4.2, 5.8], 1)
+      .then((resultado) => { if (mounted) setProyeccion(resultado); })
+      .catch(() => {});
+    return () => { mounted = false; };
+  }, []);
+
   const handleLogout = () => {
     logout();
     navigate("/login");
@@ -71,9 +79,9 @@ const ReciclajeInicio = () => {
       return;
     }
 
-    const pasos = Number(pasosFuturos);
-    if (!Number.isInteger(pasos) || pasos < 1 || pasos > 24) {
-      setErrorProyeccion("Elige entre 1 y 24 periodos para proyectar.");
+    const periodo = Number(periodoFuturo);
+    if (!Number.isInteger(periodo) || periodo <= numericos.length || periodo > 24) {
+      setErrorProyeccion(`El periodo futuro debe ser un entero entre ${numericos.length + 1} y 24.`);
       setProyeccion(null);
       return;
     }
@@ -81,7 +89,7 @@ const ReciclajeInicio = () => {
     setCalculandoProyeccion(true);
     setErrorProyeccion(null);
     try {
-      const resultado = await recyclingService.proyectarReciclaje(numericos, pasos);
+      const resultado = await recyclingService.proyectarReciclaje(numericos, periodo - numericos.length);
       setProyeccion(resultado);
     } catch (e) {
       setProyeccion(null);
@@ -182,52 +190,70 @@ const ReciclajeInicio = () => {
             </Row>
 
             <Card className="recycling-panel-card mb-4">
-              <Card.Body className="p-4 p-lg-5">
-                <Row className="align-items-center g-4">
-                  <Col lg={7}>
-                    <p className="recycling-kicker text-primary mb-2">Proyección</p>
-                    <h3 className="mb-2">Proyecta tu reciclaje</h3>
-                    <p className="text-muted mb-4">Escribe los kilos de tus últimos periodos en orden, del más antiguo al más reciente. La regresión lineal estimará los próximos periodos.</p>
-                    <Form onSubmit={handleProyectarReciclaje}>
-                      <Form.Group className="mb-3">
-                        <Form.Label>Kilos históricos (separados por coma)</Form.Label>
+              <Card.Body className="p-3 p-lg-4">
+                <h3 className="projection-heading"><FaChartLine aria-hidden="true" /> Proyección de reciclaje</h3>
+                <Form onSubmit={handleProyectarReciclaje}>
+                  <Row className="align-items-end g-3">
+                    <Col lg={6}>
+                      <Form.Group>
+                        <Form.Label>Valores históricos (kg, separados por coma)</Form.Label>
                         <Form.Control
                           type="text"
                           inputMode="decimal"
-                          placeholder="Ejemplo: 2.5, 3, 4.2, 5"
+                          placeholder="Ejemplo: 2.0, 3.5, 4.2, 5.8"
                           value={valoresHistoricos}
                           onChange={(event) => setValoresHistoricos(event.target.value)}
                           aria-describedby="proyeccion-ayuda"
+                          required
                         />
-                        <Form.Text id="proyeccion-ayuda" muted>Ingresa al menos dos valores no negativos. Usa punto para decimales.</Form.Text>
+                        <Form.Text id="proyeccion-ayuda" muted>Ordena los valores del más antiguo al más reciente.</Form.Text>
                       </Form.Group>
-                      <Row className="align-items-end g-3">
-                        <Col xs={6} sm={4}>
-                          <Form.Group>
-                            <Form.Label>Periodos a proyectar</Form.Label>
-                            <Form.Control type="number" min="1" max="24" required value={pasosFuturos} onChange={(event) => setPasosFuturos(event.target.value)} />
-                          </Form.Group>
-                        </Col>
-                        <Col xs={6} sm="auto">
-                          <Button type="submit" variant="primary" disabled={calculandoProyeccion}>
-                            {calculandoProyeccion ? "Calculando…" : "Calcular proyección"}
-                          </Button>
-                        </Col>
-                      </Row>
-                    </Form>
-                    {errorProyeccion && <Alert variant="danger" className="mt-3 mb-0">{errorProyeccion}</Alert>}
+                    </Col>
+                    <Col sm={6} lg={3}>
+                      <Form.Group>
+                        <Form.Label>Período futuro</Form.Label>
+                        <Form.Control
+                          type="number"
+                          min={valoresHistoricos.split(",").filter((valor) => valor.trim() !== "").length + 1}
+                          max="24"
+                          required
+                          value={periodoFuturo}
+                          onChange={(event) => setPeriodoFuturo(event.target.value)}
+                        />
+                      </Form.Group>
+                    </Col>
+                    <Col sm={6} lg={3}>
+                      <Button type="submit" className="projection-submit w-100" disabled={calculandoProyeccion}>
+                        {calculandoProyeccion ? "Calculando…" : "Calcular proyección"}
+                      </Button>
+                    </Col>
+                  </Row>
+                </Form>
+                {errorProyeccion && <Alert variant="danger" className="mt-3 mb-0">{errorProyeccion}</Alert>}
+                <Row className="g-3 mt-1" aria-live="polite">
+                  <Col sm={6} lg={3}>
+                    <div className="projection-metric">
+                      <span>Valor proyectado {proyeccion ? `(P${proyeccion.periodoProyectado})` : ""}</span>
+                      <strong>{proyeccion ? `${Number(proyeccion.valorProyectado).toFixed(2)} kg` : "—"}</strong>
+                    </div>
                   </Col>
-                  <Col lg={5}>
-                    {proyeccion ? (
-                      <div className="projection-result" aria-live="polite">
-                        <small>Estimación del periodo {proyeccion.periodoProyectado}</small>
-                        <strong>{Number(proyeccion.valorProyectado).toFixed(2)} kg</strong>
-                        <span>Tendencia {proyeccion.tendencia.toLowerCase()} · {Number(proyeccion.pendiente).toFixed(2)} kg por periodo</span>
-                        <span className="projection-note">Es una estimación basada en los valores que ingresaste.</span>
-                      </div>
-                    ) : (
-                      <div className="projection-placeholder">El resultado de tu proyección aparecerá aquí.</div>
-                    )}
+                  <Col sm={6} lg={3}>
+                    <div className="projection-metric">
+                      <span>Tendencia</span>
+                      <strong>{proyeccion?.tendencia || "—"}</strong>
+                    </div>
+                  </Col>
+                  <Col sm={6} lg={3}>
+                    <div className="projection-metric">
+                      <span>Pendiente (m)</span>
+                      <strong>{proyeccion ? Number(proyeccion.pendiente).toFixed(2) : "—"}</strong>
+                    </div>
+                  </Col>
+                  <Col sm={6} lg={3}>
+                    <div className="projection-metric">
+                      <span>Intercepto (b) / Muestras</span>
+                      <strong>{proyeccion ? `${Number(proyeccion.intercepto).toFixed(2)} (${proyeccion.cantidadMuestras})` : "—"}</strong>
+                    </div>
                   </Col>
                 </Row>
               </Card.Body>
@@ -258,10 +284,13 @@ const ReciclajeInicio = () => {
         .recycling-stat-card, .recycling-panel-card { border: 0; border-radius: 18px; box-shadow: 0 10px 25px rgba(20,41,92,.08); }
         .recycling-stat-card small { color: var(--pizarra); display: block; margin-bottom: .5rem; }
         .recycling-stat-card h3 { color: var(--noche); margin: 0; font-size: 1.5rem; }
-        .projection-result, .projection-placeholder { min-height: 190px; border-radius: 18px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; gap: .45rem; background: #f1f6ff; color: var(--noche); }
-        .projection-result strong { color: var(--azul); font-size: clamp(2rem, 4vw, 2.8rem); line-height: 1.1; }
-        .projection-result small, .projection-result span, .projection-placeholder { color: var(--pizarra); }
-        .projection-result .projection-note { margin-top: .5rem; font-size: .85rem; }
+        .projection-heading { display: flex; align-items: center; gap: .55rem; color: #252b36; font-size: clamp(1.2rem, 2vw, 1.55rem); font-weight: 600; margin: 0 0 1.25rem; }
+        .projection-heading svg { color: var(--azul); }
+        .projection-submit { min-height: 38px; border-radius: 999px; }
+        .projection-metric { min-height: 88px; border-radius: 16px; padding: .9rem 1rem; display: flex; flex-direction: column; justify-content: center; gap: .25rem; background: #f1f6ff; }
+        .projection-metric span { color: var(--pizarra); font-size: .9rem; }
+        .projection-metric strong { color: var(--noche); font-size: 1.15rem; }
+        .projection-metric:first-child strong { font-size: 1.25rem; }
         .recycling-bar-row + .recycling-bar-row { margin-top: 1.25rem; }
         .recycling-bar-track { height: 12px; background: #e8eefc; border-radius: 999px; overflow: hidden; }
         .recycling-bar-fill { height: 100%; background: linear-gradient(90deg, var(--azul), #6f99d9); border-radius: 999px; }
