@@ -71,6 +71,13 @@ export const recyclingService = {
     if (!data?.material) throw new Error(data?.error || "No pudimos clasificar la imagen.");
     return data;
   },
+  async proyectarReciclaje(valoresHistoricos, pasosFuturos = 1) {
+    const { data } = await clienteAxios.post("/reciclaje/regresion-lineal/proyeccion", {
+      valoresHistoricos,
+      pasosFuturos,
+    });
+    return data;
+  },
   async getCanecaSuggestion(material) {
     const config = getMaterialConfig(material);
     return {
