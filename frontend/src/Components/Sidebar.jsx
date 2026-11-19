@@ -5,10 +5,16 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaSignOutAlt, FaBars } from "react-icons/fa";
 import ImagoTipo from "./Logo"; // Cargamos el logotipo oficial de la app
 
-const Sidebar = ({ menuItems = [], onLogout }) => {
+const Sidebar = ({ menuItems = [], onLogout, mode = "english" }) => {
   const [show, setShow] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  const resolvedMode =
+    mode === "recycling" || location.pathname.startsWith("/reciclaje")
+      ? "recycling"
+      : "english";
+  const isRecyclingMode = resolvedMode === "recycling";
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -19,18 +25,34 @@ const Sidebar = ({ menuItems = [], onLogout }) => {
     navigate("/login");
   };
 
+  const toggleLink = isRecyclingMode ? "/inicio" : "/reciclaje";
+  const toggleLabel = isRecyclingMode ? "MODO RECICLAJE" : "MODO INGLÉS";
+
+  const ModeSwitch = () => (
+    <div className="sp-mode-switch-wrap">
+      <Link to={toggleLink} className="sp-mode-switch" onClick={handleClose}>
+        <span className={`sp-mode-segment ${isRecyclingMode ? "active" : ""}`}>Reciclaje</span>
+        <span className="sp-mode-separator">|</span>
+        <span className={`sp-mode-segment ${!isRecyclingMode ? "active" : ""}`}>Inglés</span>
+      </Link>
+      <div className="sp-mode-label">{toggleLabel}</div>
+    </div>
+  );
+
   const MenuContent = () => (
     <div className="d-flex flex-column h-100 sp-sidebar-inner">
-      {/* Brand Header con ImagoTipo oficial */}
       <div className="p-4 flex-shrink-0 text-start">
-        <Link to="/inicio" onClick={handleClose} className="text-decoration-none">
+        <Link to={resolvedMode === "recycling" ? "/reciclaje" : "/inicio"} onClick={handleClose} className="text-decoration-none">
           <ImagoTipo size={44} variant="negativo" />
         </Link>
       </div>
 
+      <div className="px-3 pt-2 pb-1">
+        <ModeSwitch />
+      </div>
+
       <hr className="sp-sidebar-divider mx-3 my-0" />
 
-      {/* Navegación Principal */}
       <Nav
         className="flex-column px-3 py-3 flex-grow-1"
         style={{ overflowY: "auto" }}
@@ -54,7 +76,6 @@ const Sidebar = ({ menuItems = [], onLogout }) => {
         })}
       </Nav>
 
-      {/* Botón de Salida */}
       {onLogout && (
         <div className="p-3 flex-shrink-0 border-top border-secondary border-opacity-25">
           <Button
@@ -146,6 +167,48 @@ const Sidebar = ({ menuItems = [], onLogout }) => {
           border-color: rgba(255, 255, 255, 0.12) !important;
         }
 
+        .sp-mode-switch-wrap {
+          display: flex;
+          flex-direction: column;
+          gap: .35rem;
+        }
+
+        .sp-mode-switch {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: .35rem;
+          width: 100%;
+          background: rgba(255,255,255,0.06);
+          border: 1px solid rgba(255,255,255,0.12);
+          border-radius: 12px;
+          padding: .55rem .7rem;
+          color: #fff;
+          text-decoration: none;
+          font-size: .8rem;
+          font-weight: 600;
+        }
+
+        .sp-mode-segment {
+          padding: .35rem .55rem;
+          border-radius: 8px;
+          color: #dfeaff;
+        }
+
+        .sp-mode-segment.active {
+          background: var(--azul);
+          color: #fff;
+        }
+
+        .sp-mode-label {
+          color: #dfeaff;
+          text-align: center;
+          font-size: .68rem;
+          letter-spacing: .08em;
+          text-transform: uppercase;
+          opacity: .85;
+        }
+
         .sp-nav-item {
           color: #C9D6EE !important;
           font-weight: 500;
@@ -199,14 +262,6 @@ const Sidebar = ({ menuItems = [], onLogout }) => {
           background: rgba(248, 113, 113, 0.1) !important;
           color: #EF4444 !important;
         }
-
-        /* Ajuste de margen para el contenedor de las páginas (desactivado)
-        @media (min-width: 992px) {
-          .main-content {
-            margin-left: 260px;
-          }
-        }
-        */
       `}</style>
     </>,
     document.body

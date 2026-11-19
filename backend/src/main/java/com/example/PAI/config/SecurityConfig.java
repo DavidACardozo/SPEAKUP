@@ -54,7 +54,8 @@ public class SecurityConfig {
                 .requestMatchers(
                         "/api/auth/**",
                         "/api/usuarios/login",
-                        "/api/usuarios/registrar"
+                        "/api/usuarios/registrar",
+                        "/api/reciclaje/**"
                 ).permitAll()
 
                 // =========================

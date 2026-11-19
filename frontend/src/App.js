@@ -12,6 +12,11 @@ import Historial from "./Pages/Historial";
 import AdminPanel from "./Pages/Admin/AdminPanel";
 import AdminUsuarios from "./Pages/Admin/AdminUsuarios";
 import PracticaWords from "./Pages/PracticeWords";
+import ReciclajeInicio from "./Pages/Reciclaje/ReciclajeInicio";
+import GuiaCanecas from "./Pages/Reciclaje/GuiaCanecas";
+import ReciclajeHistorial from "./Pages/Reciclaje/ReciclajeHistorial";
+import PuntosAliados from "./Pages/Reciclaje/PuntosAliados";
+import PanelAliado from "./Pages/PanelAliado";
 
 import ProtectedRoute from "./Context/ProtectedRoute";
 import { AuthProvider, useAuth } from "./Context/AuthContext";
@@ -93,6 +98,11 @@ function AnimatedRoutes() {
           <Route path="/PracticeWithIA" element={<PracticaIA />} />
           <Route path="/PracticeWords" element={<PracticaWords />} />
           <Route path="/usuarios/:usuarioId" element={<ResumenUsuario />} />
+          <Route path="/reciclaje" element={<ReciclajeInicio />} />
+          <Route path="/reciclaje/guia-canecas" element={<GuiaCanecas />} />
+          <Route path="/reciclaje/historial" element={<ReciclajeHistorial />} />
+          <Route path="/reciclaje/puntos-aliados" element={<PuntosAliados />} />
+          <Route path="/panel-aliado" element={<PanelAliado />} />
         </Route>
 
         {/* Error 404 */}

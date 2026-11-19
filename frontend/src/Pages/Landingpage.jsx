@@ -5,7 +5,6 @@ import {
   FaBookOpen,
   FaPencilAlt,
   FaUnlockAlt,
-  FaLock,
   FaCheck,
   FaTimes,
   FaRecycle,
@@ -38,7 +37,6 @@ const PASOS = [
 ];
 
 const COMPARACION = [
-  ["Costo", "Freemium: lo completo requiere suscripción", "Gratuita, sin funciones bloqueadas"],
   ["Cómo se avanza", "Se puede pasar de nivel sin dominar el contenido", "Se desbloquea solo con el 100 % en el quiz"],
   ["Evaluación", "Preguntas de selección donde se puede adivinar", "Respuesta escrita para demostrar que sabes"],
   ["Seguimiento", "Rachas y puntos centrados en la constancia", "Dashboard e historial de intentos por categoría"],
@@ -80,6 +78,7 @@ const LandingPage = () => {
               <a href="#como-funciona">Cómo funciona</a>
               <a href="#diferencias">Por qué SpeakUp</a>
               <a href="#convenios">Convenios</a>
+              <Link to="/reciclaje">Reciclaje</Link>
             </nav>
 
             <div className="d-flex align-items-center gap-2">
@@ -97,15 +96,12 @@ const LandingPage = () => {
           <Container>
             <Row className="justify-content-center">
               <Col lg={9} xl={8} className="text-center">
-                <p className="su-kicker">Vocabulario en inglés para hispanohablantes</p>
+                <p className="su-kicker">Vocabulario en inglés y reciclaje, en un solo lugar</p>
                 <h1 className="su-h1">
                   Alza tu voz, <span>palabra a palabra.</span>
                 </h1>
                 <p className="su-lead mx-auto">
-                  Aprende vocabulario en inglés categoría por categoría. Responde
-                  escribiendo, recibe retroalimentación inmediata y desbloquea el
-                  siguiente nivel cuando domines el 100 %. Gratis y desde tu
-                  navegador.
+                  Aprende vocabulario en inglés categoría por categoría y recicla con puntos aliados de tu ciudad. Responde escribiendo, recibe retroalimentación inmediata y sigue tu progreso. Desde tu navegador.
                 </p>
 
                 <div className="d-flex flex-column flex-sm-row justify-content-center gap-3 mt-4">
@@ -118,7 +114,7 @@ const LandingPage = () => {
                 </div>
 
                 <ul className="su-checks justify-content-center">
-                  <li><FaCheck aria-hidden /> Sin suscripción</li>
+                  <li><FaCheck aria-hidden /> Desde tu navegador</li>
                   <li><FaCheck aria-hidden /> Quiz de respuesta escrita</li>
                   <li><FaCheck aria-hidden /> Dashboard de progreso</li>
                 </ul>
@@ -154,6 +150,38 @@ const LandingPage = () => {
           </Container>
         </section>
 
+        <section className="su-section">
+          <Container>
+            <div className="su-section-head text-center mb-4">
+              <p className="su-kicker mb-2">RECICLA Y APRENDE</p>
+              <h2 className="su-h2">Recicla hoy, alza tu voz.</h2>
+            </div>
+            <Row className="g-4">
+              <Col md={4}>
+                <article className="su-step">
+                  <h3>Lleva tus residuos</h3>
+                  <p>Acércate a un punto aliado con tus residuos y comparte tu código para registrar la entrega.</p>
+                </article>
+              </Col>
+              <Col md={4}>
+                <article className="su-step">
+                  <h3>Ellos pesan y registran</h3>
+                  <p>El aliado anota los kilos por ti, sin trámites ni complicaciones.</p>
+                </article>
+              </Col>
+              <Col md={4}>
+                <article className="su-step">
+                  <h3>Sigue tu progreso</h3>
+                  <p>Mira tus kilos por material y continúa con tu inglés en la misma plataforma.</p>
+                </article>
+              </Col>
+            </Row>
+            <div className="text-center mt-4">
+              <Link to="/registro" className="su-btn su-btn-primary">Crear cuenta</Link>
+            </div>
+          </Container>
+        </section>
+
         <section id="diferencias" className="su-section">
           <Container>
             <Row className="g-5 align-items-start">
@@ -164,7 +192,7 @@ const LandingPage = () => {
                   SpeakUp W&amp;B busca que recuerdes las palabras.
                 </p>
                 <Link to="/registro" className="su-btn su-btn-primary mt-2">
-                  Crear cuenta gratis
+                  Crear cuenta
                 </Link>
               </Col>
 
@@ -226,7 +254,7 @@ const LandingPage = () => {
             <h2>
               Cada palabra que aprendes <span>sube el volumen de tu voz.</span>
             </h2>
-            <p>Crea tu cuenta gratis y empieza hoy con tu primera categoría.</p>
+            <p>Empieza hoy con tu primera categoría.</p>
             <Link to="/registro" className="su-btn su-btn-light su-btn-lg">
               Speak up. Tu inglés empieza hoy.
             </Link>

@@ -161,7 +161,7 @@ const Login = () => {
             </Form>
 
             <p className="sl-foot">
-              ¿Nuevo en SpeakUp? <Link to="/registro">Crea tu cuenta gratis</Link>
+              ¿Nuevo en SpeakUp? <Link to="/registro">Crea tu cuenta</Link>
             </p>
           </div>
         </main>

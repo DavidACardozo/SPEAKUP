@@ -7,7 +7,7 @@ import ImagoTipo from "../Components/Logo";
 import PageTransition from "../Components/PageTransition"; 
 
 const PUNTOS = [
-  "Gratis, sin suscripción",
+  "Recicla y registra tus kilos",
   "Vocabulario organizado por categorías",
   "Quiz de respuesta escrita con retroalimentación inmediata",
 ];
@@ -144,7 +144,7 @@ const Registro = () => {
             ) : (
               <>
                 <h2>Crea tu cuenta</h2>
-                <p className="sl-sub">Es gratis y te toma menos de un minuto.</p>
+                <p className="sl-sub">Te toma menos de un minuto.</p>
 
                 {error && (
                   <div className="sl-alert" role="alert" aria-live="polite">
