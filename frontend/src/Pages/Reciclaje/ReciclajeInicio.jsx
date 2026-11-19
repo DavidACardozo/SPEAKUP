@@ -150,58 +150,6 @@ const ReciclajeInicio = () => {
               <Col md={4}><Card className="recycling-stat-card"><Card.Body><small>Última entrega</small><h3>{summary.ultimaEntrega}</h3></Card.Body></Card></Col>
             </Row>
 
-            <Card className="recycling-panel-card mb-4">
-              <Card.Body className="p-4 p-lg-5">
-                <Row className="align-items-center g-4">
-                  <Col lg={7}>
-                    <p className="recycling-kicker text-primary mb-2">Proyección</p>
-                    <h3 className="mb-2">Proyecta tu reciclaje</h3>
-                    <p className="text-muted mb-4">Escribe los kilos de tus últimos periodos en orden, del más antiguo al más reciente. La regresión lineal estimará los próximos periodos.</p>
-                    <Form onSubmit={handleProyectarReciclaje}>
-                      <Form.Group className="mb-3">
-                        <Form.Label> Kilos históricos (separados por coma)</Form.Label>
-                        <Form.Control
-                          type="text"
-                          inputMode="decimal"
-                          placeholder="Ejemplo: 2.5, 3, 4.2, 5"
-                          value={valoresHistoricos}
-                          onChange={(event) => setValoresHistoricos(event.target.value)}
-                          aria-describedby="proyeccion-ayuda"
-                        />
-                        <Form.Text id="proyeccion-ayuda" muted>Ingresa al menos dos valores no negativos. Usa punto para decimales.</Form.Text>
-                      </Form.Group>
-                      <Row className="align-items-end g-3">
-                        <Col xs={6} sm={4}>
-                          <Form.Group>
-                            <Form.Label>Periodos a proyectar</Form.Label>
-                          <Form.Control type="number" min="1" max="24" required value={pasosFuturos} onChange={(event) => setPasosFuturos(event.target.value)} />
-                          </Form.Group>
-                        </Col>
-                        <Col xs={6} sm="auto">
-                          <Button type="submit" variant="primary" disabled={calculandoProyeccion}>
-                            {calculandoProyeccion ? "Calculando…" : "Calcular proyección"}
-                          </Button>
-                        </Col>
-                      </Row>
-                    </Form>
-                    {errorProyeccion && <Alert variant="danger" className="mt-3 mb-0">{errorProyeccion}</Alert>}
-                  </Col>
-                  <Col lg={5}>
-                    {proyeccion ? (
-                      <div className="projection-result" aria-live="polite">
-                        <small>Estimación del periodo {proyeccion.periodoProyectado}</small>
-                        <strong>{Number(proyeccion.valorProyectado).toFixed(2)} kg</strong>
-                        <span>Tendencia {proyeccion.tendencia.toLowerCase()} · {Number(proyeccion.pendiente).toFixed(2)} kg por periodo</span>
-                        <span className="projection-note">Es una estimación basada en los valores que ingresaste.</span>
-                      </div>
-                    ) : (
-                      <div className="projection-placeholder">El resultado de tu proyección aparecerá aquí.</div>
-                    )}
-                  </Col>
-                </Row>
-              </Card.Body>
-            </Card>
-
             <Row className="g-4 mb-4">
               <Col lg={8}>
                 <Card className="recycling-panel-card">
@@ -232,6 +180,58 @@ const ReciclajeInicio = () => {
                 </Card>
               </Col>
             </Row>
+
+            <Card className="recycling-panel-card mb-4">
+              <Card.Body className="p-4 p-lg-5">
+                <Row className="align-items-center g-4">
+                  <Col lg={7}>
+                    <p className="recycling-kicker text-primary mb-2">Proyección</p>
+                    <h3 className="mb-2">Proyecta tu reciclaje</h3>
+                    <p className="text-muted mb-4">Escribe los kilos de tus últimos periodos en orden, del más antiguo al más reciente. La regresión lineal estimará los próximos periodos.</p>
+                    <Form onSubmit={handleProyectarReciclaje}>
+                      <Form.Group className="mb-3">
+                        <Form.Label>Kilos históricos (separados por coma)</Form.Label>
+                        <Form.Control
+                          type="text"
+                          inputMode="decimal"
+                          placeholder="Ejemplo: 2.5, 3, 4.2, 5"
+                          value={valoresHistoricos}
+                          onChange={(event) => setValoresHistoricos(event.target.value)}
+                          aria-describedby="proyeccion-ayuda"
+                        />
+                        <Form.Text id="proyeccion-ayuda" muted>Ingresa al menos dos valores no negativos. Usa punto para decimales.</Form.Text>
+                      </Form.Group>
+                      <Row className="align-items-end g-3">
+                        <Col xs={6} sm={4}>
+                          <Form.Group>
+                            <Form.Label>Periodos a proyectar</Form.Label>
+                            <Form.Control type="number" min="1" max="24" required value={pasosFuturos} onChange={(event) => setPasosFuturos(event.target.value)} />
+                          </Form.Group>
+                        </Col>
+                        <Col xs={6} sm="auto">
+                          <Button type="submit" variant="primary" disabled={calculandoProyeccion}>
+                            {calculandoProyeccion ? "Calculando…" : "Calcular proyección"}
+                          </Button>
+                        </Col>
+                      </Row>
+                    </Form>
+                    {errorProyeccion && <Alert variant="danger" className="mt-3 mb-0">{errorProyeccion}</Alert>}
+                  </Col>
+                  <Col lg={5}>
+                    {proyeccion ? (
+                      <div className="projection-result" aria-live="polite">
+                        <small>Estimación del periodo {proyeccion.periodoProyectado}</small>
+                        <strong>{Number(proyeccion.valorProyectado).toFixed(2)} kg</strong>
+                        <span>Tendencia {proyeccion.tendencia.toLowerCase()} · {Number(proyeccion.pendiente).toFixed(2)} kg por periodo</span>
+                        <span className="projection-note">Es una estimación basada en los valores que ingresaste.</span>
+                      </div>
+                    ) : (
+                      <div className="projection-placeholder">El resultado de tu proyección aparecerá aquí.</div>
+                    )}
+                  </Col>
+                </Row>
+              </Card.Body>
+            </Card>
 
             <Card className="recycling-banner mb-4 border-0">
               <Card.Body className="d-flex justify-content-between align-items-center flex-column flex-md-row gap-3">
